@@ -3,7 +3,7 @@ package logServer;
 public class Main {
 
 	public static void main(String[] args) {
-		new LogServer();
+		new LogServer(5000);
 
 	}
 
