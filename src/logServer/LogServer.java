@@ -13,14 +13,13 @@ public class LogServer {
 	public LogServer(int portNumber){
 		try {
 			HttpServer server= HttpServer.create(new InetSocketAddress(portNumber),0);
-			server.createContext("/", new RootHandler());
+			server.createContext("/", new GetInfoHandler());
 			server.setExecutor(null);
 			server.start();
 			System.out.println("server started at "+portNumber);
 		} catch (IOException e) {
 			System.out.println("Can't create server. IOException: "+ e);
 		}
-		System.out.println("started");
 		
 	}
 
