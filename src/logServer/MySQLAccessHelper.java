@@ -41,6 +41,6 @@ public class MySQLAccessHelper {
 	
 	public void insert(String tableName, Map<String,String>values) throws Exception {
 		connect=DriverManager.getConnection("jdbc:mysql//localhost/people?"+ "user=sqluser&password=sqluserpw");
-		String query= "insert into "+tableName+" values (default, >
+		//String query= "insert into "+tableName+" values (default, >
 	}
 }

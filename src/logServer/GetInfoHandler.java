@@ -13,6 +13,8 @@ public class GetInfoHandler implements HttpHandler{
 		String response="serwerek stoi";
 		he.sendResponseHeaders(200, response.length());
 		OutputStream os=he.getResponseBody();
+		String method=he.getRequestMethod();
+		
 		os.write(response.getBytes());
 		os.close();
 		
