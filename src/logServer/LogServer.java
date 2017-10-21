@@ -9,12 +9,14 @@ import com.sun.net.httpserver.HttpHandler;
 
 
 public class LogServer {
+	private MySQLAccessHelper sqlHelper;
 	
 	public LogServer(int portNumber){
 		try {
+			sqlHelper=new MySQLAccessHelper();
 			HttpServer server= HttpServer.create(new InetSocketAddress(portNumber),0);
-			server.createContext("/", new GetInfoHandler());
-			server.createContext("/create", new CreateTableHandler());
+			server.createContext("/", new GetInfoHandler(sqlHelper));
+			server.createContext("/create", new CreateTableHandler(sqlHelper));
 			server.setExecutor(null);
 			server.start();
 			System.out.println("server started at "+portNumber);

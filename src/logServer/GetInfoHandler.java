@@ -8,6 +8,10 @@ import com.sun.net.httpserver.HttpHandler;
 
 public class GetInfoHandler implements HttpHandler{
 
+	private MySQLAccessHelper sqlHelper;
+	public GetInfoHandler(MySQLAccessHelper helper){
+		sqlHelper=helper;
+	}
 	@Override
 	public void handle(HttpExchange he) throws IOException {
 		String response="serwerek stoi";

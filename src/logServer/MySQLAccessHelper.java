@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class MySQLAccessHelper {
@@ -38,9 +39,20 @@ public class MySQLAccessHelper {
 			throw e;
 		}
 	}
+	public PreparedStatement createInsertQuery(String tableName, ArrayList<String> columns)throws Exception{
+		String SQL_INSERT="insert into "+tableName+" VALUES(";
+		for(String str: columns)
+			SQL_INSERT+="?,";
+		SQL_INSERT+=")";
+		PreparedStatement statement=connect.prepareStatement(SQL_INSERT);
+		for(int i=0; i<columns.size(); i++)
+			statement.setString(i+1, columns.get(i));
+		return statement;
+	}
 	
-	public void insert(String tableName, Map<String,String>values) throws Exception {
+	public void insert(String tableName, ArrayList<String>columns) throws Exception {
 		connect=DriverManager.getConnection("jdbc:mysql//localhost/people?"+ "user=sqluser&password=sqluserpw");
-		//String query= "insert into "+tableName+" values (default, >
+		PreparedStatement statement=createInsertQuery(tableName, columns);
+		statement.executeUpdate();
 	}
 }
