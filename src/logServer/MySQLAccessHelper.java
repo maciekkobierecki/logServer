@@ -28,22 +28,38 @@ public class MySQLAccessHelper {
 			System.out.println("database drivers not found");
 		}
 	}
-	public void readDataBase() throws Exception {
+	private void initConnection()throws Exception{
+		connect=DriverManager.getConnection("jdbc:mysql://localhost:3306/logserver?"+ "user="+Config.getProperty("DBusername")+"&password="+Config.getProperty("DBpassword"));
+	}
+	public void testMethod(){
+		
+	}
+	//method returns data in format:
+	// stringList[0] -> TableName
+	// stringList[1...n] -> columnName columnType size
+	public ArrayList<String> readDBinformation() throws Exception {
 		try{
-			connect=DriverManager.getConnection("jdbc:mysql://localhost:3306/logserver?"+ "user=admin&password=admin");
-			
+			ArrayList<String> DBinfo=new ArrayList<>();
+			initConnection();
 			statement=connect.createStatement();
 			DatabaseMetaData md=connect.getMetaData();
 			ResultSet rs=md.getTables(null,null, "%", null);
 			ResultSet columnsSet=md.getColumns(null, null, "%",null);
-			while(rs.next())
-				System.out.println(rs.getString(3));
-			while(columnsSet.next()){
-				String name=columnsSet.getString("COLUMN_NAME");
-				String type=columnsSet.getString("TYPE_NAME");
-				int size = columnsSet.getInt("COLUMN_SIZE");
+			String tableName="";
+			String columnName="";
+			String columnType="";
+			int size;
+			while(rs.next()){
+				DBinfo.add(rs.getString(3));
+				while(columnsSet.next()){
+					columnName=columnsSet.getString("COLUMN_NAME");
+					columnType=columnsSet.getString("TYPE_NAME");
+					size = columnsSet.getInt("COLUMN_SIZE");
+					DBinfo.add(columnName+" "+columnType+" "+size);
+				}
+				DBinfo.add("TableName: "+tableName+" Columns:\n")
 			}
-			//resultSet=statement.executeQuery("select * from feedback.comments");
+			return DBinfo;
 		}
 		catch (Exception e){
 			throw e;
@@ -61,7 +77,7 @@ public class MySQLAccessHelper {
 	}
 	
 	public void insert(String tableName, ArrayList<String>columns) throws Exception {
-		connect=DriverManager.getConnection("jdbc:mysql//localhost/people?"+ "user=sqluser&password=sqluserpw");
+		initConnection();
 		PreparedStatement statement=createInsertQuery(tableName, columns);
 		statement.executeUpdate();
 	}
