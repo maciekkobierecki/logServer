@@ -29,7 +29,8 @@ public class MySQLAccessHelper {
 		}
 	}
 	private void initConnection()throws Exception{
-		connect=DriverManager.getConnection("jdbc:mysql://localhost:3306/logserver?"+ "user="+Config.getProperty("DBusername")+"&password="+Config.getProperty("DBpassword"));
+		String str= "user="+Config.getProperty("DBusername")+"&password="+Config.getProperty("DBpassword");
+		connect=DriverManager.getConnection("jdbc:mysql://localhost:3306/logserver?"+str);
 	}
 	public void testMethod(){
 		
@@ -44,20 +45,21 @@ public class MySQLAccessHelper {
 			statement=connect.createStatement();
 			DatabaseMetaData md=connect.getMetaData();
 			ResultSet rs=md.getTables(null,null, "%", null);
-			ResultSet columnsSet=md.getColumns(null, null, "%",null);
 			String tableName="";
 			String columnName="";
 			String columnType="";
 			int size;
 			while(rs.next()){
-				DBinfo.add(rs.getString(3));
+				tableName=rs.getString(3);
+				DBinfo.add("TableName: "+tableName+" Columns:\n");
+				ResultSet columnsSet=md.getColumns(null, null, tableName,null);
 				while(columnsSet.next()){
 					columnName=columnsSet.getString("COLUMN_NAME");
 					columnType=columnsSet.getString("TYPE_NAME");
 					size = columnsSet.getInt("COLUMN_SIZE");
-					DBinfo.add(columnName+" "+columnType+" "+size);
+					DBinfo.add(columnName+" "+columnType+" "+size+ "\n");
 				}
-				DBinfo.add("TableName: "+tableName+" Columns:\n")
+				
 			}
 			return DBinfo;
 		}
