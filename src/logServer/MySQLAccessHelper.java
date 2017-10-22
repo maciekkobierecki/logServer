@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -29,11 +30,20 @@ public class MySQLAccessHelper {
 	}
 	public void readDataBase() throws Exception {
 		try{
-			connect=DriverManager.getConnection("jdbc:mysql//localhost/people?"+ "user=sqluser&password=sqluserpw");
+			connect=DriverManager.getConnection("jdbc:mysql://localhost:3306/logserver?"+ "user=admin&password=admin");
 			
 			statement=connect.createStatement();
-			
-			resultSet=statement.executeQuery("select * from feedback.comments");
+			DatabaseMetaData md=connect.getMetaData();
+			ResultSet rs=md.getTables(null,null, "%", null);
+			ResultSet columnsSet=md.getColumns(null, null, "%",null);
+			while(rs.next())
+				System.out.println(rs.getString(3));
+			while(columnsSet.next()){
+				String name=columnsSet.getString("COLUMN_NAME");
+				String type=columnsSet.getString("TYPE_NAME");
+				int size = columnsSet.getInt("COLUMN_SIZE");
+			}
+			//resultSet=statement.executeQuery("select * from feedback.comments");
 		}
 		catch (Exception e){
 			throw e;
