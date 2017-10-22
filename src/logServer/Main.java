@@ -3,7 +3,8 @@ package logServer;
 public class Main {
 
 	public static void main(String[] args) {
-		new LogServer(5022);
+		Config.init();
+		new LogServer(Integer.parseInt(Config.getProperty("port")));
 
 	}
 

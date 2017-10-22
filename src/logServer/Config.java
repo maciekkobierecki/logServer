@@ -9,7 +9,7 @@ import java.util.Properties;
 public class Config {
 	private static File configFile;
 	private static Properties prop;
-	public Config(){
+	public static void init(){
 		configFile=new File("config.properties");
 		try {
 			FileReader reader=new FileReader(configFile);
@@ -24,8 +24,8 @@ public class Config {
 		}
 		
 	}
-	public static String getProperty(String key, String defaultValue){
-		return prop.getProperty(key, defaultValue);
+	public static String getProperty(String key){
+		return prop.getProperty(key);
 	}
 
 }
