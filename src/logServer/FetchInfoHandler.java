@@ -26,7 +26,7 @@ public class FetchInfoHandler implements HttpHandler{
 		}
 		String response=metadataJSON.toString();
 
-		he.sendResponseHeaders(333, response.length());
+		he.sendResponseHeaders(200, response.length());
 		OutputStream os=he.getResponseBody();
 		os.write(response.getBytes());
 		os.close();
