@@ -19,6 +19,7 @@ public class LogServer {
 			server= HttpServer.create(new InetSocketAddress(portNumber),0);
 			server.createContext("/", new GetInfoHandler(sqlHelper));
 			server.createContext("/create", new CreateTableHandler(sqlHelper));
+			server.createContext("/fetchInfo",new FetchInfoHandler(sqlHelper));
 			server.setExecutor(null);
 			server.start();
 			System.out.println("server started at "+portNumber);

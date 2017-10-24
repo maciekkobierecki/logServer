@@ -10,6 +10,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 public class MySQLAccessHelper {
 	private Connection connect=null;
 	private Statement statement=null;
@@ -35,10 +37,8 @@ public class MySQLAccessHelper {
 	public void testMethod(){
 		
 	}
-	//method returns data in format:
-	// stringList[0] -> TableName
-	// stringList[1...n] -> columnName columnType size
-	public ArrayList<String> readDBinformation() throws Exception {
+	//method returns data in JSON format 
+	public JSONObject readDBinformation() throws Exception {
 		try{
 			ArrayList<String> DBinfo=new ArrayList<>();
 			initConnection();
@@ -48,20 +48,35 @@ public class MySQLAccessHelper {
 			String tableName="";
 			String columnName="";
 			String columnType="";
+			JSONObject tablesJSON=new JSONObject();
+			JSONObject tableJSON;
 			int size;
+			int tableNumber=1;
 			while(rs.next()){
+				tableJSON=new JSONObject();
+				int columnNumber=1;
 				tableName=rs.getString(3);
+				tableJSON.put("tableName", tableName);
+				JSONObject columnsJSON=new JSONObject();
+				tableJSON.put("Columns", columnsJSON);
 				DBinfo.add("TableName: "+tableName+" Columns:\n");
 				ResultSet columnsSet=md.getColumns(null, null, tableName,null);
 				while(columnsSet.next()){
+					JSONObject columnJSON=new JSONObject();
 					columnName=columnsSet.getString("COLUMN_NAME");
 					columnType=columnsSet.getString("TYPE_NAME");
 					size = columnsSet.getInt("COLUMN_SIZE");
-					DBinfo.add(columnName+" "+columnType+" "+size+ "\n");
+					columnJSON.put("columnName", columnName);
+					columnJSON.put("columnType", columnType);
+					columnJSON.put("size", size);
+					columnsJSON.put("Column"+columnNumber++, columnJSON);
+					//DBinfo.add(columnName+" "+columnType+" "+size+ "\n");
 				}
+				tablesJSON.put("table"+tableNumber, tableJSON);
+				tableNumber++;
 				
 			}
-			return DBinfo;
+			return tablesJSON;
 		}
 		catch (Exception e){
 			throw e;
