@@ -2,7 +2,8 @@ package logServer;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -10,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MySQLAccessHelper {
@@ -97,5 +99,29 @@ public class MySQLAccessHelper {
 		initConnection();
 		PreparedStatement statement=createInsertQuery(tableName, columns);
 		statement.executeUpdate();
+	}
+
+	public JSONObject readTable(String tableName)throws Exception {
+		String query= "SELECT * FROM "+tableName;
+		PreparedStatement statement= connect.prepareStatement(query);
+		ResultSet rs=statement.executeQuery();
+		return convertResultSetTableToJSONObject(rs);
+	}
+	public JSONObject convertResultSetTableToJSONObject(ResultSet dataRS) throws SQLException, JSONException{
+		JSONObject mainObject=new JSONObject();
+		ResultSetMetaData rsmd=dataRS.getMetaData();
+		JSONObject rowJSON;
+		int columnCount=rsmd.getColumnCount();
+		int counter=0;
+		while(dataRS.next()){
+			rowJSON=new JSONObject();			
+			for(int i=1; i<=columnCount; i++){
+				String columnName=rsmd.getColumnName(i);
+				Object value= dataRS.getObject(i).toString();
+				rowJSON.put(columnName, value);
+			}
+			mainObject.put("Row"+(++counter), rowJSON);
+		}
+		return mainObject;
 	}
 }
