@@ -1,16 +1,15 @@
 package logServer;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,11 +43,11 @@ public class MySQLAccessHelper {
 		String tableName=tableParametersJSON.getString("tableName");
 		tableParametersJSON.remove("tableName");
 		Iterator<String>parameters=tableParametersJSON.keys();
-		String sqlCreate="CREATE TABLE IF NOT EXISTS "+tableName+" (id INT AUTO_INCREMENT, date DATE";
+		String sqlCreate="CREATE TABLE IF NOT EXISTS "+tableName+" (id INT AUTO_INCREMENT, date VARCHAR(200)";
 		while(parameters.hasNext()){
 			sqlCreate+=",";
 			sqlCreate+=tableParametersJSON.getString(parameters.next());
-			sqlCreate+=" VARCHAR(20)";
+			sqlCreate+=" VARCHAR(200)";
 		}
 		sqlCreate+=", PRIMARY KEY(id));";
 		try {
@@ -118,21 +117,42 @@ public class MySQLAccessHelper {
 			throw e;
 		}
 	}
-	public PreparedStatement createInsertQuery(String tableName, ArrayList<String> columns)throws Exception{
-		String SQL_INSERT="insert into "+tableName+" VALUES(";
-		for(String str: columns)
-			SQL_INSERT+="?,";
+	public PreparedStatement createInsertQuery(JSONObject dataJSON)throws Exception{
+		//initConnection();
+		String tableName=dataJSON.getString("tableName");
+		dataJSON.remove("tableName");
+		String SQL_INSERT="insert into "+tableName+" VALUES(NULL";
+		for(int i=0; i<dataJSON.length(); i++)
+			SQL_INSERT+=",?";
 		SQL_INSERT+=")";
+		Statement stmt=connect.createStatement();
+		ResultSet set=stmt.executeQuery("SELECT * FROM "+tableName);
+		ResultSetMetaData metadata=set.getMetaData();
+		String columnName;
+		String value;
 		PreparedStatement statement=connect.prepareStatement(SQL_INSERT);
-		for(int i=0; i<columns.size(); i++)
+		int columnCount=metadata.getColumnCount();
+		for(int i=1; i<columnCount; i++){
+			columnName=metadata.getColumnLabel(i+1);
+			value=dataJSON.getString(columnName);		
+			statement.setString(i, value);
+		}
+
+
+			
+		return statement;
+
+		/*for(int i=0; i<columns.size(); i++)
 			statement.setString(i+1, columns.get(i));
 		return statement;
+		*/
 	}
 	
-	public void insert(String tableName, ArrayList<String>columns) throws Exception {
+	public Boolean insert(JSONObject dataJSON) throws Exception {
 		initConnection();
-		PreparedStatement statement=createInsertQuery(tableName, columns);
+		PreparedStatement statement=createInsertQuery(dataJSON);
 		statement.executeUpdate();
+		return true;
 	}
 
 	public JSONObject readTable(String tableName)throws Exception {

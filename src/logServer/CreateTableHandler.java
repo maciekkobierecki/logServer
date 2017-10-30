@@ -22,7 +22,6 @@ public class CreateTableHandler implements HttpHandler {
 	}
 	@Override
 	public void handle(HttpExchange he) throws IOException {
-		URI requestedURI=he.getRequestURI();
 		InputStreamReader isr=new InputStreamReader(he.getRequestBody(), "utf-8");
 		BufferedReader br=new BufferedReader(isr);
 		String line=br.readLine();
