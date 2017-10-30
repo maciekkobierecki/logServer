@@ -21,6 +21,7 @@ public class LogServer {
 			server.createContext("/create", new CreateTableHandler(sqlHelper));
 			server.createContext("/fetchInfo",new FetchInfoHandler(sqlHelper));
 			server.createContext("/data", new FetchTableHandler(sqlHelper));
+			server.createContext("/id", new IdHandler());
 			server.setExecutor(null);
 			server.start();
 			System.out.println("server started at "+portNumber);

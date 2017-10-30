@@ -9,6 +9,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -38,6 +39,39 @@ public class MySQLAccessHelper {
 	}
 	public void testMethod(){
 		
+	}
+	public Boolean createTable(JSONObject tableParametersJSON) throws JSONException{
+		String tableName=tableParametersJSON.getString("tableName");
+		tableParametersJSON.remove("tableName");
+		Iterator<String>parameters=tableParametersJSON.keys();
+		String sqlCreate="CREATE TABLE IF NOT EXISTS "+tableName+" (id INT AUTO_INCREMENT, date DATE";
+		while(parameters.hasNext()){
+			sqlCreate+=",";
+			sqlCreate+=tableParametersJSON.getString(parameters.next());
+			sqlCreate+=" VARCHAR(20)";
+		}
+		sqlCreate+=", PRIMARY KEY(id));";
+		try {
+			initConnection();
+			if(!checkIfTableExists(tableName)){
+			statement=connect.createStatement();
+			statement.executeUpdate(sqlCreate);
+			return true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	
+		
+	}
+	public Boolean checkIfTableExists(String tableName) throws SQLException{
+		DatabaseMetaData dbm=connect.getMetaData();
+		ResultSet rs=dbm.getTables(null, null, tableName,null);
+		if(rs.next())
+			return true;
+		else return false;
 	}
 	//method returns data in JSON format 
 	public JSONObject readDBinformation() throws Exception {
